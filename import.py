@@ -27,6 +27,8 @@ Instructions:
 
 es = Elasticsearch(['http://localhost:9200'], verify_certs=False)
 
+total_lines = 0
+
 
 def show_help():
     print("""
@@ -57,12 +59,9 @@ def validate_json_data(json_file=""):
         else:
             f.close()
 
-            count = count_file_lines(json_file)
-            print("Total JSON data lines : " + str(count))
-
             with open(json_file, encoding="utf8") as f:
                 for index, line in enumerate(f):
-                    print("Validate", index + 1, "Of", count, end="\r")
+                    print("Validate", index + 1, "Of", total_lines, end="\r")
                     # convert each line into Python object
                     try:
                         _ = json.loads(line)
@@ -172,6 +171,8 @@ def calculate_lines(lines=0, thread_amount=1):
 
 
 def run():
+    global total_lines
+
     if len(sys.argv) == 1:
         show_help()
         return
@@ -226,20 +227,28 @@ def run():
                 if 'thread' in job:
                     thread_amount = int(job['thread_amount'])
 
+        total_lines = count_file_lines(data)
+        print("Total JSON data lines : " + str(total_lines))
+
         # 1 : no import / check
         if ("check" in process_jobs) and ("import" not in process_jobs):
+            print("Run : Only check")
+
             if validate_json_data(json_file=data):
                 print("All raw JSON data valid!")
             return
 
         # 2.1 : import / check / single-thread
         if ("check" in process_jobs) and ("import" in process_jobs) and ("thread" not in process_jobs):
+            print("Run : Import using single-thread with validation")
+
             if validate_json_data(json_file=data):
                 print("All raw JSON data valid!")
 
             es1 = Elasticsearch([bulk], verify_certs=True)
             with open(data, encoding="utf8") as f:
-                for line in f:
+                for index, line in enumerate(f):
+                    print("Import", index + 1, "Of", total_lines, end="\r")
                     es1.index(index=index, doc_type=doc_type, body=json.loads(line))
 
             print("Successfully data imported!")
@@ -247,9 +256,12 @@ def run():
 
         # 2.2 : import / no check / single-thread
         if ("check" not in process_jobs) and ("import" in process_jobs) and ("thread" not in process_jobs):
+            print("Run : Import using single-thread without validation")
+
             es2 = Elasticsearch([bulk], verify_certs=True)
             with open(data, encoding="utf8") as f:
-                for line in f:
+                for index, line in enumerate(f):
+                    print("Import", index + 1, "Of", total_lines, end="\r")
                     es2.index(index=index, doc_type=doc_type, body=json.loads(line))
 
             print("Successfully data imported!")
@@ -257,15 +269,19 @@ def run():
 
         # 2.3 : import / no check / multi-threads
         if ("import" in process_jobs) and ("check" not in process_jobs) and ("thread" in process_jobs):
-            lines = count_file_lines(json_file=data)
-            if lines < 1024:
+            if total_lines < 1024:
+                print("This file is not big enough to use multi-threading !")
+                print("Run : Import using single-thread without validation")
+
                 es3 = Elasticsearch([bulk], verify_certs=True)
                 with open(data, encoding="utf8") as f:
                     for line in f:
                         es3.index(index=index, doc_type=doc_type, body=json.loads(line))
             else:
+                print("Run : Import using multi-thread without validation")
+
                 # calculate how many lines should be read for each thread
-                line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
+                line_list = calculate_lines(lines=total_lines, thread_amount=thread_amount)
                 threads = []
 
                 for line in line_list:
@@ -301,8 +317,10 @@ def run():
         if ("import" in process_jobs) and ("check" in process_jobs) and ("thread" in process_jobs):
             if validate_json_data(json_file=data):
                 print("All raw JSON data valid!")
-            lines = count_file_lines(json_file=data)
-            if lines < 1024:
+            if total_lines < 1024:
+                print("This file is not big enough to use multi-threading !")
+                print("Run : Import using multi-thread with validation")
+
                 es4 = Elasticsearch([bulk], verify_certs=True)
                 with open(data, encoding="utf8") as f:
                     for line in f:
@@ -311,8 +329,10 @@ def run():
                 exit(0)
                 return
             else:
+                print("Run : Import using multi-thread with validation")
+
                 # calculate how many lines should be read for each thread
-                line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
+                line_list = calculate_lines(lines=total_lines, thread_amount=thread_amount)
                 threads = []
 
                 for line in line_list:
