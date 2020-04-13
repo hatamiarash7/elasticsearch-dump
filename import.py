@@ -179,7 +179,8 @@ def run():
             if sys.argv[i].startswith("--"):
                 try:
                     option = sys.argv[i][2:]
-                except:
+                except Exception as e:
+                    logging.warning("You forgot something ! Error : " + str(e))
                     show_help()
                     return
 
