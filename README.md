@@ -1,6 +1,6 @@
 # ElasticSearch BigData importer
 
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/hatamiarash7/elasticsearch-dump) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/hatamiarash7/elasticsearch-dump) [![GitHub license](https://img.shields.io/github/license/hatamiarash7/elasticsearch-dump)](https://github.com/hatamiarash7/elasticsearch-dump/blob/master/LICENSE) [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
+![GitHub last commit](https://img.shields.io/github/last-commit/hatamiarash7/elasticsearch-dump) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/hatamiarash7/elasticsearch-dump) [![GitHub license](https://img.shields.io/github/license/hatamiarash7/elasticsearch-dump)](https://github.com/hatamiarash7/elasticsearch-dump/blob/master/LICENSE) [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 Imports raw JSON to Elasticsearch in a multi-thread way
 
