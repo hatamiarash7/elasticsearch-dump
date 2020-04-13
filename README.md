@@ -90,3 +90,19 @@ We have much faster process using multi-thread way. It depends on your computer/
 The whole process took about **~30 minutes** and the usage of resources were efficient
 
 ![usage](threads.png)
+
+## Support
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/D1D1WGU9)
+
+## Contributing
+
+1. Fork it!
+2. Create your feature branch : `git checkout -b my-new-feature`
+3. Commit your changes : `git commit -am 'Add some feature'`
+4. Push to the branch : `git push origin my-new-feature`
+5. Submit a pull request :D
+
+## Issues
+
+Each project may have many problems. Contributing to the better development of this project by reporting them
