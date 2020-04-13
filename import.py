@@ -76,7 +76,7 @@ def validate_json_data(json_file=""):
             return True
 
 
-def worker_import_to_es_for_threading(data='a_raw_file.json', start_line=0, stop_line=0, elastic=es, index="", doc_type=""):
+def import_for_threading(data='a_raw_file.json', start_line=0, stop_line=0, elastic=es, index="", doc_type=""):
     actions = []
     try_times = 0
     # Use linecache to put data in RAM
@@ -271,7 +271,7 @@ def run():
 
                 threads = []
                 for i in start_stop_line_list:
-                    t = threading.Thread(target=worker_import_to_es_for_threading,
+                    t = threading.Thread(target=import_for_threading,
                                          args=(
                                              data,
                                              i['start'],
@@ -318,7 +318,7 @@ def run():
 
                 threads = []
                 for i in start_stop_line_list:
-                    t = threading.Thread(target=worker_import_to_es_for_threading,
+                    t = threading.Thread(target=import_for_threading,
                                          args=(
                                              data,
                                              i['start'],
