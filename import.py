@@ -173,6 +173,8 @@ def calculate_lines(lines=0, thread_amount=1):
 def run():
     global total_lines
 
+    start_time = time.time()
+
     if len(sys.argv) == 1:
         show_help()
         return
@@ -251,7 +253,7 @@ def run():
                     print("Import", i + 1, "Of", total_lines, end="\r")
                     es1.index(index=index, doc_type=doc_type, body=json.loads(line))
 
-            print("Successfully data imported!")
+            print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
             return
 
         # 2.2 : import / no check / single-thread
@@ -264,7 +266,7 @@ def run():
                     print("Import", i + 1, "Of", total_lines, end="\r")
                     es2.index(index=index, doc_type=doc_type, body=json.loads(line))
 
-            print("Successfully data imported!")
+            print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
             return
 
         # 2.3 : import / no check / multi-threads
@@ -303,14 +305,14 @@ def run():
                 try:
                     while len(threading.enumerate()) > 1:
                         pass
-                    print("Successfully data imported!")
+                    print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
                     return
                 except KeyboardInterrupt:
                     print("Data importing interrupted!")
                     exit(0)
                     return
 
-            print("Successfully data imported!")
+            print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
             return
 
         # 2.4 : import / check / multi-threads
@@ -325,7 +327,7 @@ def run():
                 with open(data, encoding="utf8") as f:
                     for line in f:
                         es4.index(index=index, doc_type=doc_type, body=json.loads(line))
-                print("Successfully data imported!")
+                print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
                 exit(0)
                 return
             else:
@@ -354,7 +356,7 @@ def run():
                 try:
                     while len(threading.enumerate()) > 1:
                         pass
-                    print("Successfully data imported!")
+                    print("Your data imported successfully in : ", time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time)))
                     exit(0)
                     return
                 except KeyboardInterrupt:
