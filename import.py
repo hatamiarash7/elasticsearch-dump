@@ -247,8 +247,8 @@ def run():
 
             es1 = Elasticsearch([bulk], verify_certs=True)
             with open(data, encoding="utf8") as f:
-                for index, line in enumerate(f):
-                    print("Import", index + 1, "Of", total_lines, end="\r")
+                for i, line in enumerate(f):
+                    print("Import", i + 1, "Of", total_lines, end="\r")
                     es1.index(index=index, doc_type=doc_type, body=json.loads(line))
 
             print("Successfully data imported!")
@@ -260,8 +260,8 @@ def run():
 
             es2 = Elasticsearch([bulk], verify_certs=True)
             with open(data, encoding="utf8") as f:
-                for index, line in enumerate(f):
-                    print("Import", index + 1, "Of", total_lines, end="\r")
+                for i, line in enumerate(f):
+                    print("Import", i + 1, "Of", total_lines, end="\r")
                     es2.index(index=index, doc_type=doc_type, body=json.loads(line))
 
             print("Successfully data imported!")
