@@ -32,13 +32,13 @@ def show_help():
     print("""
 Options include:
 
---data                  : The JSON data file
---check                 : Check whether the file is valid raw JSON for ElasticSearch
---bulk                  : ElasticSearch bulk API address
+--data                  : The data file
+--check                 : Validate data file
+--bulk                  : ElasticSearch endpoint ( http://localhost:9200 )
 --index                 : Index name
 --type                  : Index type
---import                : Import raw JSON data to ES. This process does "--check" and data importing
---thread                : Threads amount, default 1. The more threads, the faster when importing or checking
+--import                : Import data to ES. This process does "--check" and data importing
+--thread                : Threads amount, default = 1
 --help                  : Display this help 
 """)
 
@@ -266,8 +266,8 @@ def run():
             else:
                 # calculate how many lines should be read for each thread
                 line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
-
                 threads = []
+
                 for line in line_list:
                     t = threading.Thread(target=import_for_threading,
                                          args=(
@@ -313,8 +313,8 @@ def run():
             else:
                 # calculate how many lines should be read for each thread
                 line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
-
                 threads = []
+
                 for line in line_list:
                     t = threading.Thread(target=import_for_threading,
                                          args=(
@@ -329,6 +329,7 @@ def run():
                     threads.append(t)
                     t.start()
                     t.join()
+
                 # stop all threads if interrupts
                 try:
                     while len(threading.enumerate()) > 1:
