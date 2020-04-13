@@ -10,7 +10,7 @@ import time
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 
-from utils import count_file_lines as c_file_lines
+from utils import count_file_lines
 
 try:
     import simplejson as json
@@ -58,8 +58,13 @@ def validate_json_data(json_file=""):
             raise IOError('Can not open the file "%s" , error : \n%s\n' % (json_file, str(e)))
         else:
             f.close()
+
+            count = count_file_lines(json_file)
+            print("Total JSON data lines : " + str(count))
+
             with open(json_file, encoding="utf8") as f:
-                for line in f:
+                for index, line in enumerate(f):
+                    print("Validate", index + 1, "Of", count, end="\r")
                     # convert each line into Python object
                     try:
                         _ = json.loads(line)
@@ -254,7 +259,7 @@ def run():
 
         # 2.3 : import / no check / multi-threads
         if ("import" in process_jobs) and ("check" not in process_jobs) and ("thread" in process_jobs):
-            lines = c_file_lines(json_file=data)
+            lines = count_file_lines(json_file=data)
             if lines < 1024:
                 es3 = Elasticsearch([bulk], verify_certs=True)
                 with open(data, encoding="utf8") as f:
@@ -298,7 +303,7 @@ def run():
         if ("import" in process_jobs) and ("check" in process_jobs) and ("thread" in process_jobs):
             if validate_json_data(json_file=data):
                 print("All raw JSON data valid!")
-            lines = c_file_lines(json_file=data)
+            lines = count_file_lines(json_file=data)
             if lines < 1024:
                 es4 = Elasticsearch([bulk], verify_certs=True)
                 with open(data, encoding="utf8") as f:
