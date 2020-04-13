@@ -39,7 +39,7 @@ Options include:
 --bulk                  : ElasticSearch endpoint ( http://localhost:9200 )
 --index                 : Index name
 --type                  : Index type
---import                : Import data to ES. This process does "--check" and data importing
+--import                : Import data to ES
 --thread                : Threads amount, default = 1
 --help                  : Display this help 
 """)
