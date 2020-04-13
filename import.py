@@ -17,8 +17,6 @@ try:
 except ImportError:
     import json
 
-__author__ = "Arash Hatami"
-
 """
 Instructions:
     There are 3 processes of importing raw JSON data to ElasticSearch
@@ -76,7 +74,7 @@ def validate_json_data(json_file=""):
             return True
 
 
-def import_for_threading(data='a_raw_file.json', start_line=0, stop_line=0, elastic=es, index="", doc_type=""):
+def import_for_threading(data='test_data.json', start_line=0, stop_line=0, elastic=es, index="", doc_type=""):
     actions = []
     try_times = 0
     # Use linecache to put data in RAM
@@ -120,13 +118,13 @@ def import_for_threading(data='a_raw_file.json', start_line=0, stop_line=0, elas
         try:
             helpers.bulk(elastic, actions)
         except Exception as e:
-            logging.warning("Can not send a group of actions(docs) to ElasticSearch using parallel_bulk, with error: " + str(e))
+            logging.warning("Can not send a group of docs to ElasticSearch using parallel_bulk, with error: " + str(e))
         del actions[0:len(actions)]
 
     return
 
 
-def new_return_start_stop_for_multi_thread_in_list(lines=0, thread_amount=1):
+def calculate_lines(lines=0, thread_amount=1):
     """
     Return lines to read for each thread equally
 
@@ -152,12 +150,12 @@ def new_return_start_stop_for_multi_thread_in_list(lines=0, thread_amount=1):
     iter means iteration
     """
 
-    start_stop_line_list = []
+    line_list = []
     each_has = lines / thread_amount
     last_remains = lines % thread_amount
 
     for t in range(thread_amount):
-        start_stop_line_list.append(
+        line_list.append(
             {
                 "start": each_has * t + 1,
                 "stop": each_has * (t + 1)
@@ -165,12 +163,12 @@ def new_return_start_stop_for_multi_thread_in_list(lines=0, thread_amount=1):
         )
 
     if last_remains > 0:
-        start_stop_line_list[-1] = {
+        line_list[-1] = {
             "start": each_has * (thread_amount - 1) + 1,
             "stop": lines
         }
 
-    return start_stop_line_list
+    return line_list
 
 
 def run():
@@ -267,15 +265,15 @@ def run():
                         es3.index(index=index, doc_type=doc_type, body=json.loads(line))
             else:
                 # calculate how many lines should be read for each thread
-                start_stop_line_list = new_return_start_stop_for_multi_thread_in_list(lines=lines, thread_amount=thread_amount)
+                line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
 
                 threads = []
-                for i in start_stop_line_list:
+                for line in line_list:
                     t = threading.Thread(target=import_for_threading,
                                          args=(
                                              data,
-                                             i['start'],
-                                             i['stop'],
+                                             line['start'],
+                                             line['stop'],
                                              Elasticsearch([bulk], verify_certs=True),
                                              index,
                                              doc_type
@@ -314,15 +312,15 @@ def run():
                 return
             else:
                 # calculate how many lines should be read for each thread
-                start_stop_line_list = new_return_start_stop_for_multi_thread_in_list(lines=lines, thread_amount=thread_amount)
+                line_list = calculate_lines(lines=lines, thread_amount=thread_amount)
 
                 threads = []
-                for i in start_stop_line_list:
+                for line in line_list:
                     t = threading.Thread(target=import_for_threading,
                                          args=(
                                              data,
-                                             i['start'],
-                                             i['stop'],
+                                             line['start'],
+                                             line['stop'],
                                              Elasticsearch([bulk], verify_certs=True),
                                              index,
                                              doc_type
